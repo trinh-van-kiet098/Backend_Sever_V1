@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "Gm8qShC1VOE=",
+  "success": true,
+  "projectFilePath": "C:\\Dev_Game\\Backend_Game\\Backend_Game.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\kiett\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.1\\microsoft.aspnetcore.openapi.10.0.1.nupkg.sha512",
+    "C:\\Users\\kiett\\.nuget\\packages\\microsoft.openapi\\2.0.0\\microsoft.openapi.2.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
