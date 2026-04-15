@@ -31,3 +31,14 @@ C:\Dev_Game\Backend_Game\obj\Debug\net10.0\refint\Backend_Game.dll
 C:\Dev_Game\Backend_Game\obj\Debug\net10.0\Backend_Game.pdb
 C:\Dev_Game\Backend_Game\obj\Debug\net10.0\Backend_Game.genruntimeconfig.cache
 C:\Dev_Game\Backend_Game\obj\Debug\net10.0\ref\Backend_Game.dll
+C:\Dev_Game\Backend_Game\obj\Debug\net10.0\Backend_Game.sourcelink.json
+C:\Dev_Game\Backend_Game\obj\Debug\net10.0\Backend_Game.RazorAssemblyInfo.cache
+C:\Dev_Game\Backend_Game\obj\Debug\net10.0\Backend_Game.RazorAssemblyInfo.cs
+C:\Dev_Game\Backend_Game\bin\Debug\net10.0\DnsClient.dll
+C:\Dev_Game\Backend_Game\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.dll
+C:\Dev_Game\Backend_Game\bin\Debug\net10.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+C:\Dev_Game\Backend_Game\bin\Debug\net10.0\MongoDB.Bson.dll
+C:\Dev_Game\Backend_Game\bin\Debug\net10.0\MongoDB.Driver.dll
+C:\Dev_Game\Backend_Game\bin\Debug\net10.0\SharpCompress.dll
+C:\Dev_Game\Backend_Game\bin\Debug\net10.0\Snappier.dll
+C:\Dev_Game\Backend_Game\bin\Debug\net10.0\ZstdSharp.dll

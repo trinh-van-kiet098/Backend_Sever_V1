@@ -21,3 +21,11 @@ build_property.MSBuildProjectDirectory = C:\Dev_Game\Backend_Game
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 10.0
 build_property.EnableCodeStyleSeverity = 
+
+[C:/Dev_Game/Backend_Game/Views/Home/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Dev_Game/Backend_Game/view/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = dmlld1xJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
