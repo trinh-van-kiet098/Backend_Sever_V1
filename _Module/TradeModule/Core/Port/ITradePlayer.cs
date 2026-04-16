@@ -4,8 +4,7 @@ namespace Backend_Game._Module.TradeModule.Core.Port
 {
     public interface ITradeService
     {
-        void SendTradeRequest(Trade trade);
-        void SendTradeResponse(Trade trade, string response); // response: "Accepted" or "Rejected"
-        void SendTradeRequest(string fromPlayerId, string toPlayerId);
+        Task SendTradeRequest(Trade trade);
+        Task SendTradeResponse(string tradeId, string playerId, string response);
     }
 }

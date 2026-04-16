@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 using Backend_Game._Module.Match_Map_1.Core;
 namespace Backend_Game._Module.Match_Map_1.Infra
 {
-    public class ConnectionManage : IConnecttionManage
+    public class ConnectionManage : IConnectionManage
     {
         private readonly ConcurrentDictionary<string, Guid> _connectionToPlayerMap = new();
         private readonly ConcurrentDictionary<Guid, string> _playerToConnectionMap = new();

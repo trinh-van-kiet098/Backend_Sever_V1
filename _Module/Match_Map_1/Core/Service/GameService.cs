@@ -1,29 +1,27 @@
 using Backend_Game._Module.Match_Map_1.Core.Entities;
+using Backend_Game._Module.PlayerModule.Core.Ports;
 namespace Backend_Game._Module.Match_Map_1.Core
 {
     public class GameService : IGameService
     {
         private readonly IMemoryMatch _memoryMatch;
-
-        public GameService(IMemoryMatch memoryMatch)
+        private readonly IPlayerState _playerState;
+        public GameService(IMemoryMatch memoryMatch, IPlayerState playerState)
         {
             _memoryMatch = memoryMatch;
+            _playerState = playerState;
         }
 
 
-        public void AddPlayer(string idMatch, string playerId)
+        public async Task AddPlayer(string idMatch, string playerId)
         {
-            var playerState = new PlayerState
-            {
-                Id = playerId,
-                MatchId = idMatch,
-                PositionX = 0,
-                PositionY = 0,
-                PositionZ = 0
-            };
+            //Khởi tạo PlayerState
+            var playerState = await _playerState.GetPlayerStateAsync(idMatch, Guid.Parse(playerId));
+            if (playerState == null)
+                throw new InvalidOperationException("Player not found");
+            
             _memoryMatch.AddPlayer(idMatch, playerState);
         }
-
         public IEnumerable<PlayerState> GetAllPlayerStates(string idMatch)
         {
             return _memoryMatch.GetAllPlayerStates(idMatch);

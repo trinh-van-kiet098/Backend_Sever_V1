@@ -5,10 +5,13 @@ using Backend_Game.Shared.Core.Ports;
 using Backend_Game.Shared.Infrastructure.Database;
 
 var builder = WebApplication.CreateBuilder(args);
+
+MongoDbConfig.RegisterMappings();
 builder.Services.AddOpenApi();
 builder.Services.AddMatchMap1Module();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddControllersWithViews();
+builder.Services.AddTradeModule();
 builder.Services.AddPlayerModule();
 var configuration = builder.Configuration.GetSection("MongoDbSettings");
 var connectionString = configuration["ConnectionString"];
@@ -32,10 +35,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}"

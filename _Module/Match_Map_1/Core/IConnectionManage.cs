@@ -1,6 +1,6 @@
 namespace Backend_Game._Module.Match_Map_1.Core
 {
-    public interface IConnecttionManage
+    public interface IConnectionManage
     {
         void AddMapping(string matchId, Guid playerId);
         string GetPlayerId(string connectionId);

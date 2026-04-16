@@ -33,11 +33,11 @@ namespace Backend_Game._Module.PlayerModule.Infrastructure.Adapters
         }
         public async Task UpdateAsync(Player player)
         {
-            await _database.UpdateAsync(CollectionName, player.Id, player);
+            await _database.UpdateAsync(CollectionName, player.Id.ToString(), player);
         }
         public async Task DeleteAsync(Guid id)
         {
-            await _database.DeleteAsync<Player>(CollectionName, id);
+            await _database.DeleteAsync<Player>(CollectionName, id.ToString());
         }
         /// <summary>
         /// Phương thức này cho phép tạo nhiều người chơi cùng lúc. Điều này có thể hữu ích khi bạn muốn khởi tạo một số lượng lớn người chơi hoặc thực hiện các thao tác batch. Tuy nhiên, hãy cẩn thận khi sử dụng phương thức này để tránh việc tạo quá nhiều người chơi cùng lúc, điều này có thể

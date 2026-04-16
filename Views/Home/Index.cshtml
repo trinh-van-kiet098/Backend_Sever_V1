@@ -2,640 +2,308 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Game Client - Bảng điều khiển nhân vật | SignalR</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Client - Giao dịch vàng & trang bị</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, sans-serif;
-            background: #0b0f1c;
-            color: #eef2ff;
-            margin: 0;
-            padding: 24px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 28px;
-            justify-content: center;
-        }
-
-        /* panels */
-        .panel {
-            background: rgba(18, 22, 35, 0.95);
-            backdrop-filter: blur(2px);
-            border: 1px solid #2a2f42;
-            border-radius: 28px;
-            padding: 22px 24px;
-            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.6);
-            transition: all 0.2s;
-        }
-
-        .control-panel {
-            flex: 1.2;
-            min-width: 280px;
-        }
-
-        .log-panel {
-            flex: 1.8;
-            min-width: 340px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        h3 {
-            font-size: 1.35rem;
-            font-weight: 600;
-            margin-top: 0;
-            margin-bottom: 1rem;
-            letter-spacing: -0.2px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .control-panel h3 { color: #a5f0c0; border-left: 4px solid #4caf50; padding-left: 14px; }
-        .log-panel h3:first-of-type { color: #ffb86b; border-left: 4px solid #ffb86b; padding-left: 14px; }
-        .log-panel h3:last-of-type { color: #6bcbff; border-left: 4px solid #6bcbff; padding-left: 14px; margin-top: 20px; }
-
-        input, button {
-            border-radius: 60px;
-            border: none;
-            font-weight: 500;
-            transition: 0.2s ease;
-        }
-
-        input {
-            background: #1e243b;
-            color: white;
-            padding: 12px 18px;
-            width: 100%;
-            font-size: 0.9rem;
-            border: 1px solid #333b54;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: #4caf50;
-            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.3);
-        }
-
-        button {
-            background: #2c3e66;
-            color: white;
-            padding: 10px 18px;
-            cursor: pointer;
-            font-weight: 600;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        }
-
-        button:hover {
-            background: #3e5a85;
-            transform: translateY(-1px);
-        }
-
-        button:active {
-            transform: translateY(1px);
-        }
-
-        .btn-primary {
-            background: #4caf50;
-            width: 100%;
-            font-size: 1rem;
-            padding: 12px;
-            margin-top: 8px;
-        }
-
-        .btn-primary:hover {
-            background: #3d9c41;
-        }
-
-        .move-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin: 18px 0 5px;
-        }
-
-        .move-grid button {
-            background: #2c3e66;
-            font-size: 1.4rem;
-            padding: 12px 0;
-            font-weight: bold;
-            box-shadow: 0 4px 0 #121624;
-        }
-
-        .move-grid button:active {
-            transform: translateY(2px);
-            box-shadow: 0 1px 0 #121624;
-        }
-
-        #connectionStatus {
-            background: #11161f;
-            padding: 10px 16px;
-            border-radius: 40px;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 500;
-            margin-bottom: 12px;
-        }
-
-        .status-dot {
-            height: 12px;
-            width: 12px;
-            border-radius: 50%;
-            display: inline-block;
-            transition: 0.1s;
-        }
-
-        .online { background-color: #4caf50; box-shadow: 0 0 6px #4caf50; }
-        .offline { background-color: #f44336; }
-
-        /* Danh sách nhân vật - dạng BUTTON siêu đẹp */
-        #playerList {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            max-height: 340px;
-            overflow-y: auto;
-            padding-right: 6px;
-        }
-
-        /* style cho mỗi "nhân vật" dạng button */
-        .character-card {
-            background: #1a1f2e;
-            border-radius: 60px;
-            transition: all 0.2s;
-            border: 1px solid #2f3a55;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 12px 8px 18px;
-            backdrop-filter: blur(2px);
-        }
-
-        /* nút giao dịch riêng (nếu muốn) nhưng chính bản thân thẻ cũng là nút */
-        .trade-btn {
-            background: #ff8c42;
-            border: none;
-            border-radius: 40px;
-            padding: 8px 18px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            color: #1f1a2e;
-            margin-left: 12px;
-            transition: 0.2s;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.4);
-        }
-
-        .trade-btn:hover {
-            background: #ff9f5e;
-            transform: scale(1.02);
-        }
-
-        .character-info {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            flex-wrap: wrap;
-            flex: 1;
-        }
-
-        .character-avatar {
-            background: #2c3e66;
-            width: 44px;
-            height: 44px;
-            border-radius: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #ffd966;
-            box-shadow: inset 0 1px 2px #ffffff20, 0 2px 6px black;
-        }
-
-        .character-name {
-            font-weight: 700;
-            background: #0f1420;
-            padding: 4px 12px;
-            border-radius: 30px;
-            font-size: 0.8rem;
-            font-family: monospace;
-            letter-spacing: 0.5px;
-        }
-
-        .character-position {
-            font-size: 0.8rem;
-            background: #232a3f;
-            padding: 4px 12px;
-            border-radius: 30px;
-            color: #b9fbc0;
-        }
-
-        .self-badge {
-            background: #2a5f4b;
-            color: #c3ffdf;
-            font-size: 0.7rem;
-            padding: 4px 10px;
-            border-radius: 30px;
-            font-weight: bold;
-        }
-
-        /* riêng cho nhân vật của chính mình (không phải nút giao dịch) */
-        .character-self {
-            background: #1f2a3c;
-            border: 1px solid #4caf5080;
-            opacity: 0.9;
-            cursor: default;
-        }
-
-        /* log */
-        #log {
-            background: #03060e;
-            padding: 14px;
-            border-radius: 20px;
-            height: 260px;
-            overflow-y: auto;
-            font-family: 'Fira Code', 'Courier New', monospace;
-            font-size: 12px;
-            color: #b2f0b2;
-            border: 1px solid #2a3348;
-            box-shadow: inset 0 0 8px #00000040;
-        }
-
-        ::-webkit-scrollbar {
-            width: 5px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #191e2c;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #4caf50;
-            border-radius: 10px;
-        }
-
-        hr {
-            border-color: #2a2f42;
-            margin: 16px 0;
-        }
-
-        .info-note {
-            font-size: 0.7rem;
-            color: #8f9bb3;
-            margin-top: 14px;
-            text-align: center;
-        }
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #0b0f1c; color: #eef2ff; margin: 0; padding: 20px; display: flex; gap: 20px; }
+        .panel { background: #121625; border-radius: 24px; padding: 20px; border: 1px solid #2a2f42; }
+        .control-panel { flex: 1; min-width: 300px; }
+        .log-panel { flex: 2; }
+        button { background: #2c3e66; border: none; padding: 8px 16px; border-radius: 40px; color: white; cursor: pointer; transition: 0.2s; }
+        button:hover { filter: brightness(1.2); }
+        button:disabled { background: #4b5563; cursor: not-allowed; }
+        .trade-btn { background: #ff8c42; }
+        .accept-btn { background: #4caf50; }
+        .decline-btn { background: #f44336; }
+        .character-card { background: #1a1f2e; border-radius: 60px; display: flex; justify-content: space-between; align-items: center; padding: 8px 16px; margin-bottom: 10px; border: 1px solid #2a2f42;}
+        .trade-notification { background: #1e2a2f; border-left: 5px solid #ffaa44; border-radius: 12px; padding: 16px; margin-top: 16px; display: flex; flex-direction: column; gap: 12px; }
+        .trade-actions { display: flex; gap: 10px; }
+        #log { background: #03060e; height: 350px; overflow-y: auto; font-family: monospace; padding: 10px; border-radius: 16px; border: 1px solid #1a1f2e;}
+        .log-entry { margin-bottom: 4px; border-bottom: 1px solid #1a1f2e; padding-bottom: 4px;}
+        .move-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 150px; margin-top: 12px; }
+        .trade-input-group { background: #0f1320; padding: 16px; border-radius: 16px; margin-top: 16px; border: 1px solid #2a2f42;}
+        .trade-input-group label { font-size: 0.8rem; display: block; margin-top: 8px; color: #bbd9ff; }
+        input, select { background: #1e243b; color: white; padding: 10px; border-radius: 8px; border: 1px solid #2a2f42; width: 100%; margin-top: 4px;}
+        hr { border-color: #2a2f42; margin: 16px 0; }
     </style>
 </head>
 <body>
 
 <div class="panel control-panel">
-    <h3>🎮 BẢNG ĐIỀU KHIỂN</h3>
-    <div id="connectionStatus">
-        <span class="status-dot offline" id="dot"></span>
-        <span id="statusText">⚡ Chưa kết nối</span>
-    </div>
-    
+    <h3>🎮 GIAO DỊCH & ĐIỀU KHIỂN</h3>
+    <div id="connectionStatus">🔴 Đang kết nối...</div>
     <hr>
     
-    <label style="font-weight: 500;">🏷️ MÃ PHÒNG (MATCH ID)</label>
-    <input type="text" id="matchId" value="DUNGEON_01" style="margin-top: 6px;">
-    <button id="btnJoin" class="btn-primary" onclick="joinRoom()">🚪 VÀO PHÒNG / THAM GIA</button>
-    
-    <div style="margin-top: 28px;">
-        <label>🧭 DI CHUYỂN NHÂN VẬT (X,Y,Z)</label>
+    <label>🏷️ MÃ PHÒNG</label>
+    <input type="text" id="matchId" value="MAP_1">
+    <button id="btnJoin" onclick="joinRoom()" style="margin-top: 10px; width: 100%;">🚪 VÀO PHÒNG</button>
+
+    <div style="margin-top: 20px;">
+        <label>🧭 DI CHUYỂN</label>
         <div class="move-grid">
-            <div></div>
-            <button onclick="move(0, 1, 0)" title="Tăng Y">⬆️ Y</button>
-            <div></div>
-            <button onclick="move(-1, 0, 0)" title="Giảm X">⬅️ X</button>
-            <button onclick="move(0, -1, 0)" title="Giảm Y">⬇️ Y</button>
-            <button onclick="move(1, 0, 0)" title="Tăng X">➡️ X</button>
+            <div></div><button onclick="move(0,1,0)">↑</button><div></div>
+            <button onclick="move(-1,0,0)">←</button><button onclick="move(0,-1,0)">↓</button><button onclick="move(1,0,0)">→</button>
         </div>
-        <div class="info-note">✨ Click các nút mũi tên để thay đổi vị trí → server đồng bộ tất cả người chơi</div>
     </div>
-    <div class="info-note" style="margin-top: 12px;">
-        🧙‍♂️ Mỗi nhân vật trong danh sách là một nút BẤM ĐƯỢC → Gửi yêu cầu giao dịch ngay!
+
+    <div class="trade-input-group">
+        <div style="font-weight: bold; margin-bottom: 10px;">💰 CHUẨN BỊ GIAO DỊCH</div>
+        <label>🪙 Số Vàng</label>
+        <input type="number" id="tradeGold" value="100" min="0">
+        <label>⚔️ Vật phẩm</label>
+        <select id="itemType">
+            <option value="Sword">🗡️ Kiếm</option>
+            <option value="Shield">🛡️ Khiên</option>
+            <option value="Potion">🧪 Bình máu</option>
+        </select>
+        <label>📦 Số lượng</label>
+        <input type="number" id="itemQuantity" value="1" min="1">
     </div>
+
+    <div id="tradeRequestContainer"></div>
 </div>
 
 <div class="panel log-panel">
-    <h3>🗡️ DANH SÁCH NHÂN VẬT (NHẤN VÀO ĐỂ GIAO DỊCH)</h3>
-    <div id="playerList">
-        <div style="text-align:center; padding:20px; color:#6c7a9e;">✨ Đang tải dữ liệu game...</div>
-    </div>
-    
-    <h3>📡 NHẬT KÝ SỰ KIỆN</h3>
+    <h3>👥 DANH SÁCH NHÂN VẬT (<span id="myPlayerIdText"></span>)</h3>
+    <div id="playerList">Đang chờ vào phòng...</div>
+    <hr>
+    <h3>📜 NHẬT KÝ</h3>
     <div id="log"></div>
 </div>
 
 <script>
-    // ----------------------------- SIGNALR -----------------------------
+    // 1. KHỞI TẠO DỮ LIỆU
+    const playerId = crypto.randomUUID(); 
+    document.getElementById("myPlayerIdText").innerText = "Bạn: " + playerId.substring(0,8);
+    
+    let currentMatchId = "";
+    let myPos = { x: 0, y: 0, z: 0 };
+    let currentPendingTrade = null; // Lưu object giao dịch đang chờ xử lý
+
+    // 2. CẤU HÌNH SIGNALR
     const connection = new signalR.HubConnectionBuilder()
-        .withUrl("/gamehub")
-        .withAutomaticReconnect([0, 2000, 5000, 10000])
+        .withUrl("http://localhost:5033/gamehub") // SỬA URL NÀY THEO BACKEND CỦA BẠN (VD: https://localhost:7000/gamehub)
+        .withAutomaticReconnect()
         .build();
 
-    // Trạng thái client
-    let currentPlayerId = null;          // lưu connectionId của chính mình
-    let currentMatchId = "DUNGEON_01";   // match mặc định
-    let myPosition = { x: 0, y: 0, z: 0 };
-
-    // DOM elements
-    const matchIdInput = document.getElementById("matchId");
-    const btnJoin = document.getElementById("btnJoin");
-    const playerListDiv = document.getElementById("playerList");
-    const logDiv = document.getElementById("log");
-
-    // Helper: ghi log (mới nhất ở trên cùng)
+    // 3. HÀM TIỆN ÍCH
     function writeLog(msg, type = "info") {
-        const entry = document.createElement("div");
+        const logDiv = document.getElementById("log");
         const prefix = type === "error" ? "❌ " : (type === "trade" ? "💎 " : "📢 ");
-        entry.innerText = `${prefix}${msg}`;
-        entry.style.marginBottom = "6px";
-        entry.style.borderBottom = "1px dotted #2a3348";
-        entry.style.paddingBottom = "4px";
+        const entry = document.createElement("div");
+        entry.className = "log-entry";
+        
+        // Lấy thời gian hiện tại
+        const timeString = new Date().toLocaleTimeString('vi-VN');
+        entry.innerHTML = `<span style="color:#8f9bb3; font-size:0.8rem">[${timeString}]</span> ${prefix}${msg}`;
+        
         logDiv.prepend(entry);
-        if (logDiv.children.length > 80) logDiv.removeChild(logDiv.lastChild);
     }
 
-    // Cập nhật giao diện kết nối
-    function updateConnectionStatus(connected) {
-        const dot = document.getElementById("dot");
-        const statusText = document.getElementById("statusText");
-        if (connected) {
-            dot.className = "status-dot online";
-            statusText.innerText = "🔗 Đã kết nối Server";
-        } else {
-            dot.className = "status-dot offline";
-            statusText.innerText = "⚠️ Mất kết nối";
-        }
-    }
-
-    // ================== GỬI YÊU CẦU GIAO DỊCH ==================
-    async function requestTrade(targetPlayerId) {
-        if (!targetPlayerId) return;
-        if (targetPlayerId === currentPlayerId) {
-            writeLog("🤝 Bạn không thể giao dịch với chính mình!", "error");
-            return;
-        }
-        try {
-            await connection.invoke("RequestTrade", targetPlayerId);
-            writeLog(`✨ Đã gửi yêu cầu giao dịch đến nhân vật ${targetPlayerId.substring(0, 6)}...`, "trade");
-        } catch (err) {
-            writeLog(`Gửi giao dịch thất bại: ${err}`, "error");
-        }
-    }
-
-    // Tham gia phòng
+    // 4. CHỨC NĂNG GAME
     async function joinRoom() {
-        const room = matchIdInput.value.trim();
-        if (!room) {
-            writeLog("⚠️ Vui lòng nhập mã phòng (Match ID)", "error");
-            return;
-        }
-        currentMatchId = room;
+        const matchId = document.getElementById("matchId").value;
+        if (!matchId) return;
+        currentMatchId = matchId;
+        
         try {
-            await connection.invoke("JoinMatch", room);
-            writeLog(`🏠 Đã tham gia / tạo phòng: "${room}"`, "info");
-            btnJoin.disabled = true;
-            matchIdInput.disabled = true;
-            btnJoin.style.opacity = "0.6";
-            btnJoin.innerText = "✓ ĐÃ TRONG PHÒNG";
+            await connection.invoke("JoinMatch", matchId, playerId);
+            writeLog(`🏠 Đã vào phòng ${matchId}`, "info");
+            document.getElementById("btnJoin").disabled = true;
+            document.getElementById("btnJoin").innerText = "ĐANG Ở TRONG PHÒNG";
         } catch (err) {
-            writeLog(`Không thể vào phòng: ${err}`, "error");
+            writeLog(`Lỗi vào phòng: ${err.message || err}`, "error");
         }
     }
 
-    // Di chuyển nhân vật & gửi tọa độ
     async function move(dx, dy, dz) {
-        if (!currentMatchId) {
-            writeLog("❌ Bạn chưa tham gia phòng nào! Hãy bấm 'VÀO PHÒNG' trước.", "error");
-            return;
+        if (!currentMatchId) { 
+            writeLog("Bạn chưa vào phòng!", "error"); 
+            return; 
         }
-        myPosition.x += dx;
-        myPosition.y += dy;
-        myPosition.z += dz;
+        myPos.x += dx; myPos.y += dy; myPos.z += dz;
         try {
-            await connection.invoke("SendPosition", currentMatchId, myPosition.x, myPosition.y, myPosition.z);
-            writeLog(`🚶‍♂️ Di chuyển → (${myPosition.x}, ${myPosition.y}, ${myPosition.z})`, "info");
-        } catch (err) {
-            writeLog(`Lỗi gửi vị trí: ${err}`, "error");
+            await connection.invoke("SendPosition", currentMatchId, myPos.x, myPos.y, myPos.z);
+            writeLog(`🚶 Di chuyển đến toạ độ: (${myPos.x}, ${myPos.y}, ${myPos.z})`);
+        } catch (err) { 
+            writeLog(`Lỗi di chuyển: ${err}`, "error"); 
+            // Undo vị trí nếu lỗi
+            myPos.x -= dx; myPos.y -= dy; myPos.z -= dz;
         }
     }
 
-    // ================== HIỂN THỊ DANH SÁCH NHÂN VẬT DẠNG BUTTON ==================
-    // Mỗi người chơi (ngoại trừ chính mình) sẽ hiển thị như một nút bấm có thể tương tác "Giao dịch"
-    // Yêu cầu: "thay vì chỉ in chữ hãy hiện button như nhân vật" -> mỗi nhân vật là một thẻ có thể click
-    // Cách làm: Mỗi nhân vật khác sẽ có container dạng .character-card và toàn bộ card có thể click để gửi giao dịch,
-    // kèm nút trade nổi bật. Riêng nhân vật của bạn hiển thị dạng đặc biệt (không thể click giao dịch).
-    function renderPlayerList(playersArray) {
-        if (!playersArray || playersArray.length === 0) {
-            playerListDiv.innerHTML = `<div style="text-align:center; padding:20px; color:#6c7a9e;">🌟 Chưa có người chơi trong phòng</div>`;
+    // 5. CHỨC NĂNG GIAO DỊCH
+    async function requestTrade(targetPlayerId) {
+        if (targetPlayerId === playerId) {
+            writeLog("Không thể tự giao dịch với bản thân!", "error");
             return;
         }
 
-        // Xóa nội dung cũ và render lại toàn bộ
-        playerListDiv.innerHTML = "";
+        const gold = parseInt(document.getElementById("tradeGold").value) || 0;
+        const quantity = parseInt(document.getElementById("itemQuantity").value) || 0;
+        const itemType = document.getElementById("itemType").options[document.getElementById("itemType").selectedIndex].text;
 
-        playersArray.forEach(player => {
-            const playerId = player.id;
-            const posX = player.positionX ?? 0;
-            const posY = player.positionY ?? 0;
-            const posZ = player.positionZ ?? 0;
-            const shortId = playerId.length > 8 ? playerId.substring(0, 8) + ".." : playerId;
-            
-            // Tạo container chính (card)
+        if (gold <= 0 && quantity <= 0) {
+            writeLog("Vui lòng nhập số vàng hoặc vật phẩm hợp lệ (>0)", "error");
+            return;
+        }
+
+        try {
+            // LƯU Ý: Thứ tự tham số phải khớp với C# GameHub: RequestTrade(string targetPlayerId, decimal goldAmount, int quantity)
+            await connection.invoke("RequestTrade", targetPlayerId, gold, quantity);
+            writeLog(`📨 Đã gửi yêu cầu giao dịch: ${quantity} x ${itemType} & ${gold} vàng đến người chơi ${targetPlayerId.substring(0,8)}`, "trade");
+        } catch (err) {
+            writeLog(`Lỗi gửi giao dịch: ${err.message || err}`, "error");
+        }
+    }
+
+    // Hàm gọi khi bấm nút Đồng ý / Từ chối giao dịch người khác gửi
+    async function respondToTrade(isAccept) {
+    if (!currentPendingTrade) return;
+
+    // Lấy ID giao dịch và ID người gửi từ object đã lưu
+    const tId = currentPendingTrade.id || currentPendingTrade.Id;
+    const senderId = currentPendingTrade.fromPlayerId || currentPendingTrade.FromPlayerId;
+
+    try {
+        // Gọi lên Hub: ResponseTrade(string tradeId, string targetPlayerId, bool isAccept)
+        // Lưu ý: targetPlayerId ở đây chính là người đã gửi yêu cầu cho bạn ban đầu
+        await connection.invoke("ResponseTrade", tId, senderId, isAccept);
+        
+        writeLog(`✅ Bạn đã ${isAccept ? "CHẤP NHẬN" : "TỪ CHỐI"} giao dịch`, "trade");
+        clearTradeNotification();
+    } catch (err) {
+        writeLog(`Lỗi phản hồi: ${err.message}`, "error");
+    }
+}
+
+    // Hiển thị UI khi có người gửi giao dịch đến
+    function showTradeOffer(trade) {
+    if (!trade) return;
+    
+    // Gán vào biến toàn cục để dùng khi bấm nút Respond
+    currentPendingTrade = trade; 
+    
+    // Xử lý trường hợp C# trả về PascalCase (FromPlayerId) hoặc camelCase (fromPlayerId)
+    const senderId = trade.fromPlayerId || trade.FromPlayerId || "Người chơi ẩn danh";
+    const gold = trade.goldAmount ?? trade.GoldAmount ?? 0;
+    const qty = trade.quantity ?? trade.Quantity ?? 0;
+    const tId = trade.id || trade.Id;
+
+    console.log("Đang hiển thị giao dịch từ:", senderId);
+
+    const container = document.getElementById("tradeRequestContainer");
+    
+    // Tạo nội dung HTML với ID chuẩn để gắn sự kiện
+    container.innerHTML = `
+        <div class="trade-notification" style="border: 2px solid #ff8c42; animation: pulse 2s infinite;">
+            <div style="margin-bottom: 10px;">
+                🤝 <strong>Người chơi ${senderId.substring(0, 8)}</strong> muốn giao dịch:
+            </div>
+            <div style="color: #ffaa44; font-weight: bold; font-size: 1.1rem; margin-bottom: 15px;">
+                🪙 ${gold} Vàng &nbsp;|&nbsp; 📦 ${qty} Vật phẩm
+            </div>
+            <div class="trade-actions" style="display: flex; gap: 10px;">
+                <button class="accept-btn" id="btnAcceptTrade" style="flex: 1; padding: 12px;">✅ ĐỒNG Ý</button>
+                <button class="decline-btn" id="btnDeclineTrade" style="flex: 1; padding: 12px;">❌ TỪ CHỐI</button>
+            </div>
+        </div>
+    `;
+
+    // Gắn sự kiện trực tiếp sau khi render để tránh lỗi
+    document.getElementById("btnAcceptTrade").onclick = () => respondToTrade(true);
+    document.getElementById("btnDeclineTrade").onclick = () => respondToTrade(false);
+}
+
+    function clearTradeNotification() {
+        currentPendingTrade = null;
+        document.getElementById("tradeRequestContainer").innerHTML = "";
+    }
+
+    // 6. RENDER GIAO DIỆN NGƯỜI CHƠI
+    function renderPlayers(players) {
+        const container = document.getElementById("playerList");
+        if (!players || players.length === 0) {
+            container.innerHTML = "<div style='color: #8f9bb3'>✨ Chưa có người chơi nào trong phòng</div>";
+            return;
+        }
+        
+        container.innerHTML = "";
+        players.forEach(p => {
+            const isSelf = (p.id === playerId);
             const card = document.createElement("div");
             card.className = "character-card";
             
-            // Avatar giả lập dựa trên ký tự đầu
-            const avatarChar = (shortId.charCodeAt(0) % 26 + 65).toString(36).toUpperCase();
-            
-            // Phần thông tin nhân vật
-            const infoDiv = document.createElement("div");
-            infoDiv.className = "character-info";
-            
-            // Avatar icon
-            const avatarSpan = document.createElement("div");
-            avatarSpan.className = "character-avatar";
-            avatarSpan.innerText = avatarChar;
-            
-            // Tên / ID rút gọn
-            const nameSpan = document.createElement("span");
-            nameSpan.className = "character-name";
-            nameSpan.innerText = shortId;
-            
-            // Vị trí
-            const posSpan = document.createElement("span");
-            posSpan.className = "character-position";
-            posSpan.innerText = `📍 (${posX}, ${posY}, ${posZ})`;
-            
-            infoDiv.appendChild(avatarSpan);
-            infoDiv.appendChild(nameSpan);
-            infoDiv.appendChild(posSpan);
-            
-            // Kiểm tra nếu đây là chính người chơi hiện tại
-            const isSelf = (currentPlayerId && playerId === currentPlayerId);
-            
-            if (isSelf) {
-                // Nhân vật của chính mình -> KHÔNG phải nút giao dịch, chỉ hiển thị đặc biệt
-                card.classList.add("character-self");
-                const selfBadge = document.createElement("span");
-                selfBadge.className = "self-badge";
-                selfBadge.innerText = "✨ BẠN ✨";
-                infoDiv.appendChild(selfBadge);
-                card.appendChild(infoDiv);
-                // Không có nút trade, không có sự kiện click giao dịch (chỉ hiển thị)
-                playerListDiv.appendChild(card);
-            } else {
-                // *** NHÂN VẬT KHÁCH: HIỆN THỊ NHƯ BUTTON CÓ THỂ CLICK ***
-                // Tạo nút giao dịch riêng biệt
-                const tradeButton = document.createElement("button");
-                tradeButton.className = "trade-btn";
-                tradeButton.innerText = "🤝 GIAO DỊCH";
-                tradeButton.title = `Gửi yêu cầu tới ${shortId}`;
-                
-                // Thêm sự kiện click cho nút trade (ngăn chặn sự kiện nổi bọt lên card)
-                tradeButton.addEventListener("click", (e) => {
-                    e.stopPropagation();
-                    requestTrade(playerId);
-                });
-                
-                // Toàn bộ card cũng có thể click để giao dịch (tiện lợi)
-                card.style.cursor = "pointer";
-                card.addEventListener("click", (e) => {
-                    // Không bị ảnh hưởng nếu click vào nút trade (đã stopPropagation)
-                    requestTrade(playerId);
-                });
-                card.appendChild(infoDiv);
-                card.appendChild(tradeButton);
-                playerListDiv.appendChild(card);
-            }
+            // Xử lý tọa độ (Phòng trường hợp backend trả về null/undefined)
+            const px = p.positionX || 0;
+            const py = p.positionY || 0;
+            const pz = p.positionZ || 0;
+
+            card.innerHTML = `
+                <div>
+                    <strong style="color: ${isSelf ? '#4caf50' : '#bbd9ff'}">${p.id.substring(0,8)}</strong> 
+                    <span style="font-size: 0.8rem; color: #8f9bb3">📍(${px}, ${py}, ${pz})</span>
+                </div>
+                ${!isSelf ? `<button class="trade-btn" onclick="requestTrade('${p.id}')">🤝 Giao dịch</button>` : '<span style="color:#4caf50; font-size:0.9rem">✨ Bạn</span>'}
+            `;
+            container.appendChild(card);
         });
-        
-        // Nếu có quá nhiều nhân vật, thêm hint
-        if (playersArray.length > 0) {
-            const hint = document.createElement("div");
-            hint.style.fontSize = "0.7rem";
-            hint.style.textAlign = "center";
-            hint.style.marginTop = "12px";
-            hint.style.color = "#a5b4d9";
-            hint.innerText = "💡 Nhấn vào nhân vật hoặc nút GIAO DỊCH để gửi yêu cầu";
-            playerListDiv.appendChild(hint);
-        }
     }
 
-    // ================== LẮNG NGHE SỰ KIỆN TỪ SERVER ==================
+    // ==========================================
+    // 7. LẮNG NGHE SỰ KIỆN SIGNALR TỪ BACKEND
+    // ==========================================
     
-    // 1. Nhận trạng thái game loop (danh sách người chơi và vị trí)
-    connection.on("UpdateGameState", (players) => {
-        // Cập nhật vị trí của chính mình trong mảng nếu tìm thấy (để đồng bộ local)
-        if (players && currentPlayerId) {
-            const me = players.find(p => p.id === currentPlayerId);
-            if (me) {
-                myPosition = { x: me.positionX ?? 0, y: me.positionY ?? 0, z: me.positionZ ?? 0 };
-            }
-        }
-        // Render danh sách NHÂN VẬT dạng button tương tác
-        renderPlayerList(players);
-    });
-
-    // 2. Có người chơi mới tham gia
-    connection.on("PlayerJoined", (playerId) => {
-        writeLog(`✨ Nhân vật mới gia nhập thế giới: ${playerId.substring(0, 8)}...`, "info");
-    });
-
-    // 3. Nhận yêu cầu giao dịch từ người chơi khác
-    connection.on("RequestTrade", (fromPlayerId) => {
-        writeLog(`💬 [GIAO DỊCH] Nhân vật ${fromPlayerId.substring(0, 6)}... muốn giao dịch với bạn!`, "trade");
-        // Tạo hiệu ứng cảnh báo nhẹ (có thể thêm popup tương lai)
-        const logBox = document.getElementById("log");
-        if (logBox) {
-            const tradeNotify = document.createElement("div");
-            tradeNotify.style.background = "#ff980030";
-            tradeNotify.style.padding = "4px 8px";
-            tradeNotify.style.borderRadius = "30px";
-            tradeNotify.style.margin = "6px 0";
-            tradeNotify.innerText = `🤝 Yêu cầu giao dịch từ ${fromPlayerId.substring(0, 8)}! Hãy liên hệ qua hệ thống.`;
-            logDiv.prepend(tradeNotify);
+    connection.on("MatchStateSync", (players) => renderPlayers(players));
+    
+    connection.on("UpdatePlayerPositions", (players) => renderPlayers(players));
+    
+    connection.on("PlayerJoined", (playerIdJoined) => {
+        if(playerIdJoined !== playerId) {
+            writeLog(`✨ Người chơi ${playerIdJoined.substring(0,8)} vừa vào phòng`);
         }
     });
-    
-    // 4. Tuỳ chọn: sự kiện rời phòng (nếu server có broadcast)
-    connection.on("PlayerLeft", (playerId) => {
-        writeLog(`🚪 Nhân vật rời khỏi thế giới: ${playerId.substring(0, 8)}...`, "info");
-    });
-    
-    // 5. Kết nối lại / mất kết nối
-    connection.onreconnecting((error) => {
-        updateConnectionStatus(false);
-        writeLog("🔄 Mất kết nối, đang thử kết nối lại...", "error");
-    });
-    
-    connection.onreconnected((connectionId) => {
-        updateConnectionStatus(true);
-        currentPlayerId = connectionId;
-        writeLog(`✅ Kết nối khôi phục! ID mới: ${connectionId.substring(0, 8)}...`, "info");
-        // Nếu đã từng join phòng trước đó, gửi lại tọa độ hoặc cập nhật phòng? 
-        // Server vẫn nhớ group? thường signalR tự động tham gia lại group nếu dùng WithAutomaticReconnect và server có xử lý OnReconnected.
-        // Để an toàn, ta có thể gửi lại vị trí hiện tại sau khi reconnect nếu đã có matchId
-        if (currentMatchId && btnJoin.disabled === true) {
-            setTimeout(async () => {
-                try {
-                    await connection.invoke("SendPosition", currentMatchId, myPosition.x, myPosition.y, myPosition.z);
-                    writeLog(`📡 Đã đồng bộ lại vị trí sau khi reconnect`, "info");
-                } catch(e) { /* bỏ qua */ }
-            }, 500);
-        }
-    });
-    
-    connection.onclose((error) => {
-        updateConnectionStatus(false);
-        writeLog("🔌 Kết nối đã đóng. Trang sẽ tự động thử kết nối lại.", "error");
-        btnJoin.disabled = false;
-        matchIdInput.disabled = false;
-        btnJoin.style.opacity = "1";
-        btnJoin.innerText = "🚪 VÀO PHÒNG";
+
+    // Bắt lỗi Giao dịch do Backend tự ném ra (Exception)
+    connection.on("TradeError", (errorMessage) => {
+        writeLog(`⚠️ Lỗi giao dịch: ${errorMessage}`, "error");
     });
 
-    // ================== KHỞI TẠO KẾT NỐI SIGNALR ==================
-    async function startConnection() {
+    // Lắng nghe sự kiện người khác gửi giao dịch cho mình
+    // *Lưu ý: Phụ thuộc vào Backend gửi object hay các biến rời. 
+    // Giả sử NotificationService của C# gửi nguyên object Trade
+    connection.on("ReceiveTradeOffer", (trade) => {
+        writeLog(`📩 Nhận yêu cầu giao dịch từ ${trade.fromPlayerId.substring(0,8)}`, "trade");
+        showTradeOffer(trade);
+    });
+
+    // Kết quả sau khi đối phương bấm Accept / Reject
+    connection.on("TradeResult", (message) => {
+        writeLog(`📢 Thông báo giao dịch: ${message}`, "trade");
+        clearTradeNotification();
+    });
+
+    // ==========================================
+    // 8. KHỞI ĐỘNG KẾT NỐI
+    // ==========================================
+    async function startSignalR() {
         try {
             await connection.start();
-            currentPlayerId = connection.connectionId;
-            updateConnectionStatus(true);
-            writeLog(`✅ Kết nng, người dùng chủ động bấm nút
-            // Nhưng nếu muốn trải nghiệm nhanh, cóối SignalR thành công! ID nhân vật: ${currentPlayerId.substring(0, 10)}...`, "info");
-            // Sau khi kết nối, không tự động join phò thể hiển thị sẵn sàng
+            document.getElementById("connectionStatus").innerHTML = "🟢 Đã kết nối máy chủ";
+            document.getElementById("connectionStatus").style.color = "#4caf50";
+            writeLog("✅ Kết nối SignalR thành công.");
         } catch (err) {
-            console.error(err);
-            updateConnectionStatus(false);
-            writeLog(`❌ Không thể kết nối server: ${err}`, "error");
-            setTimeout(startConnection, 5000);
+            document.getElementById("connectionStatus").innerHTML = "🔴 Lỗi kết nối, đang thử lại...";
+            document.getElementById("connectionStatus").style.color = "#f44336";
+            setTimeout(startSignalR, 5000); // Thử kết nối lại sau 5 giây
         }
     }
     
-    // Hàm hỗ trợ gán lại sự kiện cho các nút move khi cần (đã có sẵn global)
-    window.joinRoom = joinRoom;
-    window.move = move;
-    window.requestTrade = requestTrade;   // để dùng nếu cần từ console
-    
-    // Khởi động kết nối
-    startConnection();
-    
-    // Bổ sung: nếu người dùng thay đổi matchId trước khi join thì vẫn ổn
-    // Hỗ trợ reset giao diện nếu cần thoát phòng ảo (không cần thiết)
-    // Thêm thông báo hướng dẫn
-    writeLog("🎮 CHÀO MỪNG! Hãy nhấn 'VÀO PHÒNG' và di chuyển. Mỗi nhân vật trong danh sách là một nút để giao dịch.", "info");
-    
-    // Chú thích: Hiện tại mỗi người chơi khác hiển thị dạng card có thể click (toàn bộ card) + nút giao dịch riêng.
-    // Đáp ứng yêu cầu: "thay vì chỉ in chữ hãy hiện button như nhân vật" – tất cả nhân vật khác đều là button tương tác rõ ràng.
+
+    startSignalR();
+
 </script>
 </body>
 </html>

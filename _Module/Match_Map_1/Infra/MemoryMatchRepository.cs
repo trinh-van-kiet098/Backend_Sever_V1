@@ -17,7 +17,7 @@ namespace Backend_Game._Module.Match_Map_1.Infra
         public void AddPlayer(string idMatch, PlayerState playerState)
         {
             playerState.MatchId = idMatch;
-            
+
             // Ghi vào Kho chính
             var playersInRoom = _rooms.GetOrAdd(idMatch, _ => new ConcurrentDictionary<string, PlayerState>());
             playersInRoom.TryAdd(playerState.Id, playerState);
@@ -37,12 +37,16 @@ namespace Backend_Game._Module.Match_Map_1.Infra
 
         public void RemovePlayer(string playerId)
         {
+            if (string.IsNullOrEmpty(playerId))
+            {
+                return;
+            }
             if (_playerToMatchLookup.TryRemove(playerId, out string? idMatch))
             {
                 if (_rooms.TryGetValue(idMatch, out var playersInRoom))
                 {
                     playersInRoom.TryRemove(playerId, out _);
-                    if (playersInRoom.IsEmpty) 
+                    if (playersInRoom.IsEmpty)
                     {
                         _rooms.TryRemove(idMatch, out _);
                     }

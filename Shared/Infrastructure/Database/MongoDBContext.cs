@@ -7,7 +7,6 @@ namespace Backend_Game.Shared.Infrastructure.Database
     public class MongoDBContext : IDatabase
     {
         private readonly IMongoDatabase _db;
-
         public MongoDBContext(IMongoDatabase database)
         {
             _db = database;
@@ -30,14 +29,14 @@ namespace Backend_Game.Shared.Infrastructure.Database
             return await collection.Find(predicate).ToListAsync();
         }
 
-        public async Task UpdateAsync<T>(string collectionName, Guid id, T entity)
+        public async Task UpdateAsync<T>(string collectionName, string id, T entity)
         {
             // Trong MongoDB, khóa chính thường map với field "Id" hoặc "_id"
             var filter = Builders<T>.Filter.Eq("Id", id);
             await _db.GetCollection<T>(collectionName).ReplaceOneAsync(filter, entity);
         }
 
-        public async Task DeleteAsync<T>(string collectionName, Guid id)
+        public async Task DeleteAsync<T>(string collectionName, string id)
         {
             var filter = Builders<T>.Filter.Eq("Id", id);
             await _db.GetCollection<T>(collectionName).DeleteOneAsync(filter);
